@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Тарихи Одақ — Бірлескен жұмысқа шақыру</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Cinzel және Montserrat -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-dark: #100d0b;
+      --card-bg: rgba(28, 22, 18, 0.94);
+      --gold: #d4af37;
+      --gold-light: #f3e5ab;
+      --text-main: #f5efe6;
+      --text-muted: #c2b5a3;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      min-height: 100vh;
+      background-color: var(--bg-dark);
+      background-image:
+        radial-gradient(circle at 50% 25%, rgba(62, 46, 30, 0.55) 0%, rgba(16, 13, 11, 0.95) 75%),
+        repeating-linear-gradient(0deg, rgba(212, 175, 55, 0.025) 0px, rgba(212, 175, 55, 0.025) 1px, transparent 1px, transparent 48px),
+        repeating-linear-gradient(90deg, rgba(212, 175, 55, 0.025) 0px, rgba(212, 175, 55, 0.025) 1px, transparent 1px, transparent 48px);
+      color: var(--text-main);
+      font-family: 'Montserrat', sans-serif;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Артқы тарихи карта мен астролябия қабаты */
+    .history-bg-layer {
+      position: fixed;
+      inset: -40px;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+      transition: transform 0.25s ease-out;
+    }
+
+    .astrolabe-spin {
+      animation: spinSlow 90s linear infinite;
+      transform-origin: center;
+    }
+
+    .astrolabe-spin-reverse {
+      animation: spinReverse 65s linear infinite;
+      transform-origin: center;
+    }
+
+    @keyframes spinSlow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes spinReverse {
+      from { transform: rotate(360deg); }
+      to { transform: rotate(0deg); }
+    }
+
+    /* Қалықтайтын тарихи артефакттар */
+    .floating-artifact {
+      position: absolute;
+      opacity: 0.14;
+      filter: sepia(0.7) drop-shadow(0 0 8px rgba(212, 175, 55, 0.25));
+      animation: floatArtifact 12s ease-in-out infinite;
+    }
+
+    @keyframes floatArtifact {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-18px) rotate(6deg); }
+    }
+
+    /* Негізгі шақыру карточкасы */
+    .invitation-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(8px);
+      border: 1.5px solid rgba(212, 175, 55, 0.75);
+      box-shadow:
+        0 25px 60px rgba(0, 0, 0, 0.85),
+        inset 0 0 35px rgba(212, 175, 55, 0.1);
+    }
+
+    /* Антикалық алтын бұрыштар */
+    .corner-ornament {
+      position: absolute;
+      width: 26px;
+      height: 26px;
+      border-color: var(--gold);
+      pointer-events: none;
+    }
+    .corner-tl { top: 10px; left: 10px; border-top: 2px solid; border-left: 2px solid; border-top-left-radius: 6px; }
+    .corner-tr { top: 10px; right: 10px; border-top: 2px solid; border-right: 2px solid; border-top-right-radius: 6px; }
+    .corner-bl { bottom: 10px; left: 10px; border-bottom: 2px solid; border-left: 2px solid; border-bottom-left-radius: 6px; }
+    .corner-br { bottom: 10px; right: 10px; border-bottom: 2px solid; border-right: 2px solid; border-bottom-right-radius: 6px; }
+
+    .font-cinzel {
+      font-family: 'Cinzel', serif;
+    }
+
+    .gold-badge {
+      color: var(--gold);
+      background: rgba(212, 175, 55, 0.08);
+      border: 1px solid rgba(212, 175, 55, 0.45);
+    }
+
+    .gold-title {
+      color: var(--gold-light);
+    }
+
+    .muted-text {
+      color: var(--text-muted);
+    }
+
+    .details-box {
+      background: rgba(255, 255, 255, 0.025);
+      border-left: 3px solid var(--gold);
+      border-top: 1px solid rgba(212, 175, 55, 0.12);
+      border-right: 1px solid rgba(212, 175, 55, 0.12);
+      border-bottom: 1px solid rgba(212, 175, 55, 0.12);
+    }
+
+    .date-highlight {
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.24), rgba(170, 130, 28, 0.08));
+      border: 1px solid rgba(212, 175, 55, 0.65);
+      box-shadow: 0 4px 18px rgba(212, 175, 55, 0.18);
+    }
+
+    #yesBtn {
+      background: linear-gradient(135deg, #e0be46, #a87e18);
+      color: #120e0b;
+      box-shadow: 0 6px 22px rgba(212, 175, 55, 0.4);
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+    }
+
+    #yesBtn:hover {
+      box-shadow: 0 10px 28px rgba(212, 175, 55, 0.65);
+    }
+
+    #noBtn {
+      background: rgba(20, 17, 15, 0.85);
+      color: var(--text-muted);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      transition: left 0.16s ease-out, top 0.16s ease-out, background 0.2s ease;
+    }
+
+    #noBtn:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .tease-text {
+      color: var(--gold);
+    }
+
+    .seal {
+      animation: pop 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0.3) rotate(-15deg); opacity: 0; }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+
+    .whatsapp-btn {
+      background: linear-gradient(135deg, #25D366, #128C7E);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 6px 20px rgba(37, 211, 102, 0.35);
+      transition: transform 0.15s ease, box-shadow 0.2s ease;
+    }
+
+    .whatsapp-btn:hover {
+      box-shadow: 0 8px 25px rgba(37, 211, 102, 0.55);
+      transform: translateY(-1px);
+    }
+
+    /* Алтын конфетти canvas */
+    #confettiCanvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 50;
+    }
+  </style>
+</head>
+<body class="w-full flex items-center justify-center p-4 sm:p-6">
+
+  <!-- Фондық музыка (батырмасыз, автоматты түрде ойнайды) -->
+  <audio id="bgMusic" loop preload="auto" src="amour-plastique.mp3"></audio>
+
+  <!-- Дүниежүзілік тарих атмосфералық артқы фоны -->
+  <div class="history-bg-layer" id="parallaxBg">
+    <!-- Көне әлем картасының координат торы мен айналатын астролябия -->
+    <svg class="w-full h-full opacity-35" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Меридиандар мен параллельдер (Көне карта стилі) -->
+      <g stroke="#d4af37" stroke-opacity="0.14" stroke-width="1">
+        <ellipse cx="600" cy="400" rx="540" ry="340" />
+        <ellipse cx="600" cy="400" rx="410" ry="340" />
+        <ellipse cx="600" cy="400" rx="270" ry="340" />
+        <ellipse cx="600" cy="400" rx="130" ry="340" />
+        <line x1="600" y1="60" x2="600" y2="740" />
+        <line x1="600" y1="400" x2="1140" y2="400" />
+        <path d="M 110 240 Q 600 290 1090 240" />
+        <path d="M 110 560 Q 600 510 1090 560" />
+        <path d="M 220 130 Q 600 180 980 130" />
+        <path d="M 220 670 Q 600 620 980 670" />
+      </g>
+
+      <!-- Орталық айналатын астролябия / ежелгі компас -->
+      <g class="astrolabe-spin" stroke="#d4af37" stroke-opacity="0.22">
+        <circle cx="600" cy="400" r="290" stroke-width="1.5" stroke-dasharray="10 6" />
+        <circle cx="600" cy="400" r="265" stroke-width="0.8" />
+        <polygon points="600,95 612,388 905,400 612,412 600,705 588,412 295,400 588,388" fill="rgba(212, 175, 55, 0.04)" stroke-width="1" />
+      </g>
+
+      <g class="astrolabe-spin-reverse" stroke="#f3e5ab" stroke-opacity="0.18">
+        <circle cx="600" cy="400" r="215" stroke-width="1" stroke-dasharray="4 8" />
+        <polygon points="390,190 600,382 810,190 618,400 810,610 600,418 390,610 582,400" stroke-width="0.8" />
+      </g>
+    </svg>
+
+    <!-- Қалықтайтын тарихи символдар -->
+    <div class="floating-artifact text-4xl sm:text-5xl" style="top: 10%; left: 8%; animation-delay: 0s;">🏛️</div>
+    <div class="floating-artifact text-3xl sm:text-4xl" style="top: 16%; right: 10%; animation-delay: 2s;">📜</div>
+    <div class="floating-artifact text-4xl sm:text-5xl" style="bottom: 14%; left: 11%; animation-delay: 4s;">🧭</div>
+    <div class="floating-artifact text-3xl sm:text-4xl" style="bottom: 16%; right: 9%; animation-delay: 1.5s;">⚔️</div>
+    <div class="floating-artifact text-3xl sm:text-4xl" style="top: 48%; left: 5%; animation-delay: 3.2s;">👑</div>
+    <div class="floating-artifact text-3xl sm:text-4xl" style="top: 45%; right: 6%; animation-delay: 5s;">⏳</div>
+  </div>
+
+  <!-- Алтын конфетти қабаты -->
+  <canvas id="confettiCanvas"></canvas>
+
+  <!-- Шақыру экраны -->
+  <main class="invitation-card relative z-10 w-full max-w-[540px] rounded-2xl px-6 py-9 sm:px-9 sm:py-10 text-center" id="inviteScreen">
+    <!-- Антикалық бұрыштар -->
+    <span class="corner-ornament corner-tl"></span>
+    <span class="corner-ornament corner-tr"></span>
+    <span class="corner-ornament corner-bl"></span>
+    <span class="corner-ornament corner-br"></span>
+
+    <div class="gold-badge inline-flex items-center gap-2 text-[11px] sm:text-xs tracking-[2px] uppercase px-4 py-1.5 rounded-full mb-4">
+      <span>🏛️</span>
+      <span>Дүниежүзілік Тарих • Ресми Нота</span>
+    </div>
+
+    <h1 class="font-cinzel gold-title text-2xl sm:text-[27px] font-extrabold leading-snug mb-3.5">
+      Тарихи Одақ Құру Туралы Шақыру
+    </h1>
+
+    <p class="muted-text text-sm sm:text-[15px] leading-relaxed mb-6">
+      Құрметті кураторымыз <strong class="gold-title font-semibold">Нигара Абдусаттарова</strong>! Шәкірттеріңіз <strong class="gold-title font-semibold">Мадиомар Данияр</strong> мен <strong class="gold-title font-semibold">Байдаулетова Аяжан</strong> сізге Дүниежүзілік тарих пәні бойынша бірлескен жұмысқа ресми шақыру жолдайды!
+    </p>
+
+    <div class="details-box rounded-xl px-4 py-4 text-left mb-7 text-sm leading-7 space-y-2.5">
+      <div><strong class="gold-title">✍️ Жолдаушылар:</strong> Мадиомар Данияр және Байдаулетова Аяжан</div>
+      <div><strong class="gold-title">🎓 Адресат:</strong> Кураторымыз Нигара Абдусаттарова</div>
+      <div class="date-highlight rounded-lg px-3 py-2 flex flex-wrap items-center justify-between gap-2 my-1">
+        <span><strong class="gold-title">🗓️ Күні мен уақыты:</strong></span>
+        <span class="font-cinzel font-bold text-[#f3e5ab] tracking-wide bg-[#120e0b]/80 border border-[#d4af37]/60 px-3 py-0.5 rounded text-xs sm:text-sm">
+          ✨ 19 ҚАРАША • САҒАТ 20:00 ✨
+        </span>
+      </div>
+      <div><strong class="gold-title">📌 Күн тәртібі:</strong> Дүниежүзілік тарих бойынша бірлескен жұмыс</div>
+      <div><strong class="gold-title">⚔️ Мақсат:</strong> Тақырыптарды терең талдау, даталарды жүйелеу және тесттерді бірге талқандау</div>
+    </div>
+
+    <div class="text-base sm:text-lg font-bold text-white mb-6 leading-snug">
+      Одаққа қосылып, 19 қараша сағат 20:00-де бірге жұмыс істеуге келісесіз бе?
+    </div>
+
+    <div class="flex flex-wrap justify-center items-center gap-4 min-h-[64px]">
+      <button id="yesBtn" type="button" class="rounded-xl font-bold px-7 py-3.5 text-base cursor-pointer z-10">
+        Иә, келісемін! 🤝
+      </button>
+      <button id="noBtn" type="button" class="rounded-xl font-bold px-5 py-3 text-sm cursor-pointer relative z-20">
+        Жоқ, бас тартамын
+      </button>
+    </div>
+
+    <div class="tease-text mt-4 min-h-[24px] text-[13px] italic font-medium" id="teaseText"></div>
+  </main>
+
+  <!-- Келісім экраны -->
+  <section class="invitation-card relative z-10 w-full max-w-[540px] rounded-2xl px-6 py-9 sm:px-9 sm:py-10 text-center hidden" id="successScreen">
+    <!-- Антикалық бұрыштар -->
+    <span class="corner-ornament corner-tl"></span>
+    <span class="corner-ornament corner-tr"></span>
+    <span class="corner-ornament corner-bl"></span>
+    <span class="corner-ornament corner-br"></span>
+
+    <div class="seal text-5xl sm:text-[58px] mb-3.5">🏛️📜✨</div>
+    <div class="gold-badge inline-block text-xs tracking-[2px] uppercase px-4 py-1.5 rounded-full mb-4">
+      Келісім мөрмен расталды
+    </div>
+
+    <h1 class="font-cinzel gold-title text-2xl sm:text-[27px] font-extrabold leading-snug mb-3.5">
+      Тарихи Одақ Құрылды!
+    </h1>
+
+    <p class="muted-text text-sm sm:text-[15px] leading-relaxed mb-6">
+      Рахмет, <strong class="gold-title font-semibold">Нигара Абдусаттарова</strong>! Сіздің келісіміңіз біз үшін үлкен мәртебе. <strong class="gold-title font-semibold">19 қараша, сағат 20:00-де</strong> Дүниежүзілік тарихтың кез келген тақырыбы мен тестін бірге жеңеміз!
+    </p>
+
+    <div class="details-box rounded-xl px-4 py-4 text-left mb-6 text-sm leading-7 space-y-2.5">
+      <div class="date-highlight rounded-lg px-3 py-1.5 flex flex-wrap items-center justify-between gap-2">
+        <span><strong class="gold-title">🗓️ Бекітілген уақыт:</strong></span>
+        <span class="font-cinzel font-bold text-[#f3e5ab] tracking-wide">19 қараша, сағат 20:00 ✅</span>
+      </div>
+      <div><strong class="gold-title">👥 Одақ құрамы:</strong> Нигара Абдусаттарова, Мадиомар Данияр, Байдаулетова Аяжан</div>
+      <div><strong class="gold-title">📌 Статус:</strong> Бірлескен жұмыс күшіне енді</div>
+    </div>
+
+    <!-- WhatsApp-қа тікелей өту батырмасы -->
+    <a id="whatsappBtn" href="#" target="_blank" rel="noopener noreferrer" class="whatsapp-btn inline-flex items-center justify-center gap-2.5 rounded-xl font-bold px-6 py-3.5 text-sm sm:text-base cursor-pointer active:scale-95">
+      <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+        <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.1.824zM12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2.546 20.2c-.151.512.333.996.845.845l3.032-.892A9.955 9.955 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"/>
+      </svg>
+      <span>WhatsApp-қа жауап жіберу</span>
+    </a>
+  </section>
+
+  <script>
+    const noBtn = document.getElementById('noBtn');
+    const yesBtn = document.getElementById('yesBtn');
+    const teaseText = document.getElementById('teaseText');
+    const inviteScreen = document.getElementById('inviteScreen');
+    const successScreen = document.getElementById('successScreen');
+    const whatsappBtn = document.getElementById('whatsappBtn');
+    const parallaxBg = document.getElementById('parallaxBg');
+    const bgMusic = document.getElementById('bgMusic');
+
+    // ==========================================================================
+    // ФОНДЫҚ МУЗЫКА (Amour Plastique, slowed + reverb)
+    // Браузер автоплейді блоктайтындықтан, бет ашылғанда қосып көреміз,
+    // болмаса пайдаланушының алғашқы әрекетінде (басу/түрту) іске қосылады.
+    // ==========================================================================
+    let isPlaying = false;
+
+    async function startBackgroundMusic() {
+      if (isPlaying) return;
+      try {
+        bgMusic.volume = 0.7;
+        await bgMusic.play();
+        isPlaying = true;
+      } catch (err) {
+        // Автоплей блокталды: алғашқы әрекетті күтеміз
+      }
+    }
+
+    window.addEventListener('load', startBackgroundMusic);
+
+    const unlockAudioOnFirstAction = async () => {
+      await startBackgroundMusic();
+      if (isPlaying) {
+        ['click', 'touchstart', 'pointerdown', 'keydown'].forEach((evt) => {
+          document.removeEventListener(evt, unlockAudioOnFirstAction);
+        });
+      }
+    };
+
+    ['click', 'touchstart', 'pointerdown', 'keydown'].forEach((evt) => {
+      document.addEventListener(evt, unlockAudioOnFirstAction, { passive: true });
+    });
+
+    const MY_WHATSAPP_NUMBER = "77768371473";
+    const REPLY_MESSAGE = "Сәлем, Данияр және Аяжан! Тарихи одаққа қосылуға келісемін 🤝 19 қараша, сағат 20:00-де кездесеміз!";
+
+    // WhatsApp сілтемесін автоматты құрастыру
+    whatsappBtn.href = `https://wa.me/${MY_WHATSAPP_NUMBER}?text=${encodeURIComponent(REPLY_MESSAGE)}`;
+
+    // Курсор қозғалғанда артқы картаның жеңіл параллакс әсері
+    document.addEventListener('mousemove', (e) => {
+      const moveX = (e.clientX / window.innerWidth - 0.5) * -18;
+      const moveY = (e.clientY / window.innerHeight - 0.5) * -18;
+      parallaxBg.style.transform = `translate(${moveX}px, ${moveY}px)`;
+    });
+
+    const excuses = [
+      "Наполеонның өзі мұндай жылдам шегінбеген!",
+      "Куратордың қолдауынсыз бұл тақырыпты еңсере алмаймыз!",
+      "Данияр мен Аяжан сізді күтіп отыр, батырма қашып кетті 😄",
+      "Одақтан бас тарту туралы пакт қабылданбады!",
+      "«Иә» батырмасы сізді күтіп тұр, қараңызшы қалай өсіп жатыр!",
+      "Бұл шешім Вестфаль бітіміне қайшы келеді!",
+      "19 қараша сағат 20:00 тарих бетіне алтын әріппен жазылуы тиіс 😉"
+    ];
+
+    let attempt = 0;
+    let yesScale = 1;
+
+    function moveNoButton() {
+      const padding = 20;
+      const btnWidth = noBtn.offsetWidth || 175;
+      const btnHeight = noBtn.offsetHeight || 46;
+
+      const maxX = Math.max(padding, window.innerWidth - btnWidth - padding);
+      const maxY = Math.max(padding, window.innerHeight - btnHeight - padding);
+
+      const randomX = Math.max(padding, Math.floor(Math.random() * maxX));
+      const randomY = Math.max(padding, Math.floor(Math.random() * maxY));
+
+      noBtn.style.position = 'fixed';
+      noBtn.style.left = randomX + 'px';
+      noBtn.style.top = randomY + 'px';
+
+      teaseText.textContent = excuses[attempt % excuses.length];
+      attempt++;
+
+      yesScale = Math.min(yesScale + 0.14, 1.9);
+      yesBtn.style.transform = `scale(${yesScale})`;
+    }
+
+    noBtn.addEventListener('mouseover', moveNoButton);
+    noBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      moveNoButton();
+    }, { passive: false });
+    noBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      moveNoButton();
+    });
+
+    // Алтын ұшқындар (конфетти) анимациясы
+    function launchGoldConfetti() {
+      const canvas = document.getElementById('confettiCanvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const colors = ['#d4af37', '#f3e5ab', '#ffd700', '#aa821c', '#fff4cc'];
+      const particles = Array.from({ length: 110 }, () => ({
+        x: canvas.width / 2,
+        y: canvas.height / 2,
+        vx: (Math.random() - 0.5) * 14,
+        vy: (Math.random() - 0.7) * 14,
+        size: Math.random() * 7 + 3,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        alpha: 1,
+        rotation: Math.random() * 360,
+        vRot: (Math.random() - 0.5) * 10
+      }));
+
+      function animateConfetti() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let active = false;
+
+        particles.forEach((p) => {
+          if (p.alpha > 0.02) {
+            active = true;
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += 0.25;
+            p.alpha -= 0.012;
+            p.rotation += p.vRot;
+
+            ctx.save();
+            ctx.globalAlpha = Math.max(0, p.alpha);
+            ctx.translate(p.x, p.y);
+            ctx.rotate((p.rotation * Math.PI) / 180);
+            ctx.fillStyle = p.color;
+            ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.65);
+            ctx.restore();
+          }
+        });
+
+        if (active) {
+          requestAnimationFrame(animateConfetti);
+        } else {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+      }
+
+      animateConfetti();
+    }
+
+    yesBtn.addEventListener('click', () => {
+      inviteScreen.classList.add('hidden');
+      noBtn.style.display = 'none';
+      successScreen.classList.remove('hidden');
+      startBackgroundMusic();
+      launchGoldConfetti();
+    });
+  </script>
+</body>
+</html>
